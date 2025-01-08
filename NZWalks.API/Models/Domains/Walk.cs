@@ -6,7 +6,7 @@
         public string Name { get; set; }
         public string Decription{ get; set; }
         public string LengthInKm{ get; set; }
-        public string TheWalkImageUrl{ get; set; }
+        public string? TheWalkImageUrl{ get; set; }
 
         public Guid DifficultyID { get; set; }
 
