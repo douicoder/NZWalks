@@ -18,6 +18,7 @@ namespace NZWalks.API.Repositories.AccountRepos
 
         public IConfiguration Configuration { get; }
 
+        //TODO:ADD SILENT RELODING IN UI
         public string CreateJWTToken(IdentityUser user, List<string> roles)
         {
             // Create claims

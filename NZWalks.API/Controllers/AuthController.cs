@@ -1,9 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
 using NZWalks.API.Models.DTO.AccountDtos;
 using NZWalks.API.Repositories.AccountRepos;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace NZWalks.API.Controllers
 {
@@ -45,27 +50,36 @@ namespace NZWalks.API.Controllers
 
         }
         [HttpPost]
-        [Route("Login")]
         public async Task<IActionResult> Login([FromBody]LoginRequestDto loginRequestDto) 
         {
             var user = await userManager.FindByEmailAsync(loginRequestDto.Username);
-            if(user != null) 
+
+            if (user != null)
             {
-               var checkRasswordResult= await userManager.CheckPasswordAsync(user, loginRequestDto.Password);
-                if (checkRasswordResult) 
+                var checkPasswordResult = await userManager.CheckPasswordAsync(user, loginRequestDto.Password);
+
+                if (checkPasswordResult)
                 {
-                    //Getting user
+                    // Get Roles for this user
                     var roles = await userManager.GetRolesAsync(user);
-                    if (roles != null) 
+
+                    if (roles != null)
                     {
-                        //CreteToken
-                       var jwttoken= tokenRepository.CreateJWTToken(user, roles.ToList());
-                        var responce= new LoginResponceDto { JwtToken = jwttoken };
-                        return Ok(responce);
-                    }                  
+                        // Create Token
+
+                        var jwtToken = tokenRepository.CreateJWTToken(user, roles.ToList());
+
+                        var response = new LoginResponceDto
+                        {
+                            JwtToken = jwtToken
+                        };
+
+                        return Ok(response);
+                    }
                 }
             }
-            return BadRequest("UserName or Password was incorrect");
+
+            return BadRequest("Username or password incorrect");
         }
 
 
